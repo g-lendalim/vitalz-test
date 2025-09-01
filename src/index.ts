@@ -25,18 +25,6 @@ export interface StatusItemProps {
   color: 'primary' | 'success' | 'warning' | 'error' | 'info';
 }
 
-export interface SleepData {
-  LoginEmail: string;
-  DeviceUserID: string;
-  Date: string;
-  SleepOnset: string;
-  WakeUpTime: string;
-  Awake: string;
-  Deep: string;
-  Light: string;
-  TotalTimeAsleep: string;
-}
-
 export interface CalendarDateSelectorProps {
   sleepData: SleepData[];
   userScores: UserScore[];
@@ -68,6 +56,45 @@ export interface DataModalProps {
   deviceUserID: string;
   sleepData: SleepData[];
   userScores: UserScore[];
+}
+
+export interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+export interface SleepData {
+  LoginEmail: string;
+  DeviceUserID: string;
+  Date: string;
+  SleepOnset: string;
+  WakeUpTime: string;
+  Awake: string;
+  Deep: string;
+  Light: string;
+  TotalTimeAsleep: string;
+}
+
+export interface SleepDataTabProps {
+  sleepData: SleepData | undefined;
+}
+
+export interface SleepStage {
+  label: string;
+  value: number;
+  color: string;
+  icon: React.ReactNode;
+  description: string;
+  gradient: string;
+}
+
+export interface SleepMetric {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  color: string;
+  subtitle?: string;
 }
 
 export interface UserScore {

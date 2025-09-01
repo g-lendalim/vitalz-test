@@ -90,6 +90,7 @@ export const Dashboard: React.FC = () => {
         open={modalOpen}
         onClose={handleModalClose}
         date={selectedDate}
+        sleepData={sleepData}
       />
     </Container>
   );

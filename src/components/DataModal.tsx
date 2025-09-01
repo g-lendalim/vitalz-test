@@ -11,18 +11,30 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { formatDate } from "../utils/formatters";
-import type { DataModalProps } from "../index";
+import type { DataModalProps, TabPanelProps } from "../index";
+import { SleepDataTab } from "./SleepDataTab";
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
+  return (
+    <div hidden={value !== index}>
+      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
+    </div>
+  );
+};
 
 export const DataModal: React.FC<DataModalProps> = ({
   open,
   onClose,
   date,
+  sleepData
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  const sleepDataForDate = sleepData.find((item) => item.Date === date);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -49,6 +61,11 @@ export const DataModal: React.FC<DataModalProps> = ({
             <Tab label="Statistics" />
           </Tabs>
         </Box>
+
+        <TabPanel value={tabValue} index={0}>
+          <SleepDataTab sleepData={sleepDataForDate} />
+        </TabPanel>
+
       </DialogContent>
     </Dialog>
   );
