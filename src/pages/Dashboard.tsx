@@ -91,6 +91,7 @@ export const Dashboard: React.FC = () => {
         onClose={handleModalClose}
         date={selectedDate}
         sleepData={sleepData}
+        userScores={userScores}
       />
     </Container>
   );

@@ -105,6 +105,10 @@ export interface UserScore {
   ScoreType: string;
 }
 
+export interface UserScoreTabProps {
+  userScore: UserScore | undefined;
+}
+
 export interface UserStatistics {
   LoginEmail: string;
   DeviceUserID: string;

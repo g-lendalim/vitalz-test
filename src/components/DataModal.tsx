@@ -10,9 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { SleepDataTab } from "./SleepDataTab";
+import { UserScoreTab } from "./UserScoreTab";
 import { formatDate } from "../utils/formatters";
 import type { DataModalProps, TabPanelProps } from "../index";
-import { SleepDataTab } from "./SleepDataTab";
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
   return (
@@ -26,7 +27,8 @@ export const DataModal: React.FC<DataModalProps> = ({
   open,
   onClose,
   date,
-  sleepData
+  sleepData,
+  userScores,
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
@@ -35,6 +37,7 @@ export const DataModal: React.FC<DataModalProps> = ({
   };
 
   const sleepDataForDate = sleepData.find((item) => item.Date === date);
+  const scoreForDate = userScores.find((item) => item.Date === date);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -66,6 +69,9 @@ export const DataModal: React.FC<DataModalProps> = ({
           <SleepDataTab sleepData={sleepDataForDate} />
         </TabPanel>
 
+        <TabPanel value={tabValue} index={1}>
+          <UserScoreTab userScore={scoreForDate} />
+        </TabPanel>
       </DialogContent>
     </Dialog>
   );

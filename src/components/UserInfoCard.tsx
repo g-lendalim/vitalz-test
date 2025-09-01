@@ -76,7 +76,7 @@ const InfoRow: React.FC<InfoRowProps> = ({
   icon,
   label,
   value,
-  iconColor = "#1976d2", // default color
+  iconColor = "#1976d2", 
   copyable = true,
   monospace = false,
 }) => {
