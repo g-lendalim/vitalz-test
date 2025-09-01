@@ -8,7 +8,7 @@ import {
   Alert,
   IconButton,
   Chip,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -20,7 +20,13 @@ import {
 } from "@mui/icons-material";
 import { getScoreColor } from "../utils/metrics";
 import type { UserScore, CalendarDateSelectorProps, DayInfo } from "../index";
-import { formatScoreType, getDateString, getMonthYear, isSameDay, getDateRange } from "../utils/formatters";
+import {
+  formatScoreType,
+  getDateString,
+  getMonthYear,
+  isSameDay,
+  getDateRange,
+} from "../utils/formatters";
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const CALENDAR_WEEKS = 6;
@@ -36,13 +42,13 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
 }) => {
   const initialMonth = useMemo(() => {
     const allDates = [
-      ...sleepData.map(item => item.Date),
-      ...userScores.map(item => item.Date),
+      ...sleepData.map((item) => item.Date),
+      ...userScores.map((item) => item.Date),
     ];
-    
+
     if (allDates.length > 0) {
       const latestDate = new Date(
-        Math.max(...allDates.map(d => new Date(d).getTime()))
+        Math.max(...allDates.map((d) => new Date(d).getTime()))
       );
       return new Date(latestDate.getFullYear(), latestDate.getMonth(), 1);
     }
@@ -53,12 +59,12 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
 
   const { availableDates, dateScoreMap, dateRange } = useMemo(() => {
     const dates = new Set([
-      ...sleepData.map(item => item.Date),
-      ...userScores.map(item => item.Date),
+      ...sleepData.map((item) => item.Date),
+      ...userScores.map((item) => item.Date),
     ]);
 
     const scoreMap = new Map<string, UserScore>();
-    userScores.forEach(score => {
+    userScores.forEach((score) => {
       scoreMap.set(score.Date, score);
     });
 
@@ -72,7 +78,7 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
   }, [sleepData, userScores]);
 
   const navigateMonth = useCallback((direction: "prev" | "next") => {
-    setCurrentMonth(prev => {
+    setCurrentMonth((prev) => {
       const newMonth = new Date(prev);
       newMonth.setMonth(newMonth.getMonth() + (direction === "next" ? 1 : -1));
       return newMonth;
@@ -83,32 +89,35 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
     setCurrentMonth(new Date(date.getFullYear(), date.getMonth(), 1));
   }, []);
 
-  const handleQuickNavigation = useCallback((type: 'first' | 'last' | 'current') => {
-    const today = new Date();
-    
-    switch (type) {
-      case 'first':
-        if (dateRange) {
-          navigateToMonth(dateRange.start);
-        }
-        break;
-      case 'last':
-        if (dateRange) {
-          navigateToMonth(dateRange.end);
-        }
-        break;
-      case 'current':
-        navigateToMonth(today);
-        break;
-    }
-  }, [dateRange, navigateToMonth]);
+  const handleQuickNavigation = useCallback(
+    (type: "first" | "last" | "current") => {
+      const today = new Date();
+
+      switch (type) {
+        case "first":
+          if (dateRange) {
+            navigateToMonth(dateRange.start);
+          }
+          break;
+        case "last":
+          if (dateRange) {
+            navigateToMonth(dateRange.end);
+          }
+          break;
+        case "current":
+          navigateToMonth(today);
+          break;
+      }
+    },
+    [dateRange, navigateToMonth]
+  );
 
   const calendarDays = useMemo((): DayInfo[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
     const firstDayOfMonth = new Date(year, month, 1);
     const startDate = new Date(firstDayOfMonth);
-    
+
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const days: DayInfo[] = [];
@@ -138,21 +147,24 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
     return days;
   }, [currentMonth, availableDates, dateScoreMap]);
 
-  const handleDateClick = useCallback((dayInfo: DayInfo) => {
-    if (dayInfo.isCurrentMonth) {
-      onDateSelect(dayInfo.dateString);
-    }
-  }, [onDateSelect]);
+  const handleDateClick = useCallback(
+    (dayInfo: DayInfo) => {
+      if (dayInfo.isCurrentMonth) {
+        onDateSelect(dayInfo.dateString);
+      }
+    },
+    [onDateSelect]
+  );
 
   const getScoreIndicatorColor = useCallback((dayInfo: DayInfo) => {
     if (!dayInfo.hasData) return null;
-    
+
     if (dayInfo.scoreData) {
       const scoreType = dayInfo.scoreData.ScoreType;
       return `${getScoreColor(scoreType)}.main`;
     }
-    
-    return "primary.main"; 
+
+    return "primary.main";
   }, []);
 
   if (loading) {
@@ -191,37 +203,40 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CalendarToday color="primary" />
             <Typography variant="h6">Select Date</Typography>
-              <Chip
-                label={`${availableDates.size} days recorded`}
-                size="small"
-              />
+            <Chip label={`${availableDates.size} days recorded`} size="small" />
           </Box>
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title="First data">
-              <IconButton 
-                size="small" 
-                onClick={() => handleQuickNavigation('first')}
-                disabled={!dateRange}
-              >
-                <FirstPage fontSize="small" />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={() => handleQuickNavigation("first")}
+                  disabled={!dateRange}
+                >
+                  <FirstPage fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title="Today">
-              <IconButton 
-                size="small" 
-                onClick={() => handleQuickNavigation('current')}
-              >
-                <CalendarToday fontSize="small" />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={() => handleQuickNavigation("current")}
+                >
+                  <CalendarToday fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title="Latest data">
-              <IconButton 
-                size="small" 
-                onClick={() => handleQuickNavigation('last')}
-                disabled={!dateRange}
-              >
-                <LastPage fontSize="small" />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={() => handleQuickNavigation("last")}
+                  disabled={!dateRange}
+                >
+                  <LastPage fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
           </Box>
         </Box>
@@ -278,21 +293,27 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
           >
             {calendarDays.map((dayInfo, index) => {
               const indicatorColor = getScoreIndicatorColor(dayInfo);
-              
+
               return (
                 <Tooltip
                   key={index}
                   title={
                     dayInfo.isCurrentMonth
-                      ? `${dayInfo.date.toLocaleDateString("en-US", { 
-                          weekday: "short", 
-                          month: "short", 
-                          day: "numeric", 
-                          year: "numeric" 
+                      ? `${dayInfo.date.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
                         })}${
                           dayInfo.hasData
                             ? dayInfo.scoreData
-                              ? ` - Score: ${dayInfo.scoreData.VitalzScore} (${formatScoreType(dayInfo.scoreData.ScoreType)})`
+                              ? ` - Score: ${dayInfo.scoreData.VitalzScore} ${
+                                  dayInfo.scoreData.ScoreType
+                                    ? `(${formatScoreType(
+                                        dayInfo.scoreData.ScoreType
+                                      )})`
+                                    : ""
+                                }`
                               : " - Data available"
                             : " - No data"
                         }`
@@ -308,29 +329,41 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      cursor: (dayInfo.hasData || dayInfo.isCurrentMonth) ? "pointer" : "default",
-                      backgroundColor: dayInfo.isToday ? "primary.light" : "transparent",
+                      cursor:
+                        dayInfo.hasData || dayInfo.isCurrentMonth
+                          ? "pointer"
+                          : "default",
+                      backgroundColor: dayInfo.isToday
+                        ? "primary.light"
+                        : "transparent",
                       border: dayInfo.isToday ? "2px solid" : "1px solid",
                       borderColor: dayInfo.isToday ? "primary.main" : "divider",
                       borderRadius: 2,
                       opacity: dayInfo.isCurrentMonth ? 1 : 0.3,
                       transition: "all 0.2s ease-in-out",
-                      "&:hover": (dayInfo.hasData || dayInfo.isCurrentMonth) ? {
-                        backgroundColor: dayInfo.isToday ? "primary.light" : "action.hover",
-                        transform: dayInfo.hasData ? "scale(1.05)" : "none",
-                        boxShadow: dayInfo.hasData ? 2 : 0,
-                      } : {},
+                      "&:hover":
+                        dayInfo.hasData || dayInfo.isCurrentMonth
+                          ? {
+                              backgroundColor: dayInfo.isToday
+                                ? "primary.light"
+                                : "action.hover",
+                              transform: dayInfo.hasData
+                                ? "scale(1.05)"
+                                : "none",
+                              boxShadow: dayInfo.hasData ? 2 : 0,
+                            }
+                          : {},
                       position: "relative",
                     }}
                   >
                     <Typography
                       variant="body2"
                       sx={{
-                        fontWeight: dayInfo.isToday 
-                          ? 600 
-                          : dayInfo.hasData 
-                            ? 500 
-                            : 400,
+                        fontWeight: dayInfo.isToday
+                          ? 600
+                          : dayInfo.hasData
+                          ? 500
+                          : 400,
                         color: dayInfo.isToday
                           ? "primary.contrastText"
                           : dayInfo.isCurrentMonth
