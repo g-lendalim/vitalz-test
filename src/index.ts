@@ -37,6 +37,39 @@ export interface SleepData {
   TotalTimeAsleep: string;
 }
 
+export interface CalendarDateSelectorProps {
+  sleepData: SleepData[];
+  userScores: UserScore[];
+  onDateSelect: (date: string) => void;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface DayInfo {
+  date: Date;
+  dateString: string;
+  day: number;
+  isCurrentMonth: boolean;
+  hasData: boolean;
+  scoreData?: UserScore;
+  isToday: boolean;
+}
+
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+export interface DataModalProps {
+  open: boolean;
+  onClose: () => void;
+  date: string;
+  loginEmail: string;
+  deviceUserID: string;
+  sleepData: SleepData[];
+  userScores: UserScore[];
+}
+
 export interface UserScore {
   LoginEmail: string;
   DeviceUserID: string;
