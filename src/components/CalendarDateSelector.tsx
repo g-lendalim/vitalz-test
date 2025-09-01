@@ -18,7 +18,7 @@ import {
   FirstPage,
   LastPage,
 } from "@mui/icons-material";
-import { getScoreColor } from "../utils/metrics";
+import { getScoreConfig } from "../utils/metrics";
 import type { UserScore, CalendarDateSelectorProps, DayInfo } from "../index";
 import {
   formatScoreType,
@@ -161,7 +161,8 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
 
     if (dayInfo.scoreData) {
       const scoreType = dayInfo.scoreData.ScoreType;
-      return `${getScoreColor(scoreType)}.main`;
+      const config = getScoreConfig(scoreType);
+      return config.color;
     }
 
     return "primary.main";
