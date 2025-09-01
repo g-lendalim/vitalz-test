@@ -6,6 +6,25 @@ export interface User {
   DeviceUserID: string;
 }
 
+export interface UserInfoCardProps {
+  user: User;
+}
+
+export interface InfoRowProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  iconColor: string;
+  copyable?: boolean;
+  monospace?: boolean;
+}
+
+export interface StatusItemProps {
+  label: string;
+  value: string;
+  color: 'primary' | 'success' | 'warning' | 'error' | 'info';
+}
+
 export interface SleepData {
   LoginEmail: string;
   DeviceUserID: string;

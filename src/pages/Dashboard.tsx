@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Typography, Box, Grid, Paper } from "@mui/material";
 import { UserSelector } from "../components/UserSelector";
+import { UserInfoCard } from "../components/UserInfoCard";
 import { useUsers } from "../hooks/useApi";
 import type { User } from "../index";
 
@@ -39,6 +40,12 @@ export const Dashboard: React.FC = () => {
             />
           </Paper>
         </Grid>
+
+        {selectedUser && (
+          <>
+            <UserInfoCard user={selectedUser} />
+          </>
+        )}
       </Grid>
     </Container>
   );
