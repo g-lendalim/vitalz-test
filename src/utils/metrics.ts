@@ -34,8 +34,8 @@ export const getHRColor = (hr: number): "error" | "warning" | "success" => {
 };
 
 export const getHRVColor = (hrv: number): "error" | "warning" | "success" => {
-  if (hrv < 30) return "error";
-  if (hrv < 50) return "warning";
+  if (hrv < 20) return "error";
+  if (hrv < 30) return "warning";
   return "success";
 };
 

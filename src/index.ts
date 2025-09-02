@@ -119,6 +119,43 @@ export interface UserStatistics {
   OxygenSaturation: number;
 }
 
+export interface MetricStats {
+  average: number;
+  min: number;
+  max: number;
+  range: number;
+  standardDeviation: number;
+  outliers: number[];
+  trend: 'up' | 'down' | 'stable';
+  variabilityScore: 'low' | 'medium' | 'high';
+}
+
+export interface ProcessedStatistics {
+  raw: UserStatistics[];
+  hr: MetricStats;
+  hrv: MetricStats;
+  oxygen: MetricStats;
+  totalReadings: number;
+  timeRange: { start: string; end: string };
+}
+
+export interface UserStatisticsTabProps {
+  loginEmail: string;
+  deviceUserID: string;
+  date: string;
+}
+
+export interface MetricCardProps {
+  label: string;
+  stats: MetricStats;
+  unit: string;
+  icon: React.ReactNode;
+  color: "error" | "warning" | "success";
+  rawData: number[];
+  description: string;
+  processedStatistics: ProcessedStatistics | null;
+}
+
 export interface ApiResponse<T> {
   status: number;
   data: T[];

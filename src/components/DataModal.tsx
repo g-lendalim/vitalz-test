@@ -12,6 +12,7 @@ import {
 import { Close } from "@mui/icons-material";
 import { SleepDataTab } from "./SleepDataTab";
 import { UserScoreTab } from "./UserScoreTab";
+import { UserStatisticsTab } from "./UserStatisticsTab";
 import { formatDate } from "../utils/formatters";
 import type { DataModalProps, TabPanelProps } from "../index";
 
@@ -27,6 +28,8 @@ export const DataModal: React.FC<DataModalProps> = ({
   open,
   onClose,
   date,
+  loginEmail,
+  deviceUserID,
   sleepData,
   userScores,
 }) => {
@@ -71,6 +74,14 @@ export const DataModal: React.FC<DataModalProps> = ({
 
         <TabPanel value={tabValue} index={1}>
           <UserScoreTab userScore={scoreForDate} />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          <UserStatisticsTab
+            loginEmail={loginEmail}
+            deviceUserID={deviceUserID}
+            date={date}
+          />
         </TabPanel>
       </DialogContent>
     </Dialog>

@@ -90,6 +90,8 @@ export const Dashboard: React.FC = () => {
         open={modalOpen}
         onClose={handleModalClose}
         date={selectedDate}
+        loginEmail={selectedUser?.LoginEmail || ""}
+        deviceUserID={selectedUser?.DeviceUserID || ""}
         sleepData={sleepData}
         userScores={userScores}
       />
