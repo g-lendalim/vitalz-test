@@ -34,8 +34,12 @@ export const formatScoreType = (str: string): string => {
   return str.replace(/([a-z])([A-Z])/g, "$1 $2");
 };
 
-export const getDateString = (date: Date): string =>
-  date.toISOString().split("T")[0];
+export const getDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export const isSameDay = (date1: Date, date2: Date): boolean =>
   getDateString(date1) === getDateString(date2);
