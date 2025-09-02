@@ -23,7 +23,7 @@ import {
   Warning,
   Error,
 } from "@mui/icons-material";
-import { formatDuration, formatTime } from "../utils/formatters";
+import { formatDuration, formatTimeforSleepData } from "../utils/formatters";
 import type { SleepDataTabProps, SleepStage, SleepMetric } from "../index";
 
 const SLEEP_PARAMETERS = {
@@ -438,14 +438,14 @@ export const SleepDataTab: React.FC<SleepDataTabProps> = ({ sleepData }) => {
     },
     {
       label: "Sleep Onset",
-      value: formatTime(sleepData.SleepOnset),
+      value: formatTimeforSleepData(sleepData.SleepOnset),
       icon: <WbTwilight />,
       color: "#7b1fa2",
       subtitle: "Time you fell asleep",
     },
     {
       label: "Wake Time",
-      value: formatTime(sleepData.WakeUpTime),
+      value: formatTimeforSleepData(sleepData.WakeUpTime),
       icon: <WbSunny />,
       color: "#f57c00",
       subtitle: "Time you woke up",
