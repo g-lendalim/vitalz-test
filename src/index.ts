@@ -19,18 +19,28 @@ export interface InfoRowProps {
   monospace?: boolean;
 }
 
-export interface StatusItemProps {
-  label: string;
-  value: string;
-  color: 'primary' | 'success' | 'warning' | 'error' | 'info';
-}
-
 export interface CalendarDateSelectorProps {
   sleepData: SleepData[];
   userScores: UserScore[];
   onDateSelect: (date: string) => void;
   loading: boolean;
   error: string | null;
+}
+
+export interface CalendarDayProps {
+  day: DayInfo;
+  onClick: (day: DayInfo) => void;
+  getColor: (day: DayInfo) => string | null;
+}
+
+export interface MonthNavigationProps {
+  currentMonth: Date;
+  navigateMonth: (dir: "prev" | "next") => void;
+}
+
+export interface QuickNavProps {
+  dateRange: { start: Date; end: Date } | null;
+  handleQuickNavigation: (type: "first" | "last" | "current") => void;
 }
 
 export interface DayInfo {
@@ -126,8 +136,8 @@ export interface MetricStats {
   range: number;
   standardDeviation: number;
   outliers: number[];
-  trend: 'up' | 'down' | 'stable';
-  variabilityScore: 'low' | 'medium' | 'high';
+  trend: "up" | "down" | "stable";
+  variabilityScore: "low" | "medium" | "high";
 }
 
 export interface ProcessedStatistics {

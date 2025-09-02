@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarToday,
-  FiberManualRecord,
   FirstPage,
   LastPage,
 } from "@mui/icons-material";
@@ -33,6 +32,64 @@ const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;
 const TOTAL_CALENDAR_DAYS = CALENDAR_WEEKS * DAYS_PER_WEEK;
 
+const cardStyles = {
+  borderRadius: 3,
+  background: "rgba(255, 255, 255, 0.9)",
+  backdropFilter: "blur(20px)",
+  border: "1px solid rgba(255, 255, 255, 0.2)",
+};
+
+const navButtonStyles = {
+  backgroundColor: "rgba(255, 255, 255, 0.8)",
+  border: "1px solid rgba(102, 126, 234, 0.1)",
+  "&:hover": {
+    backgroundColor: "rgba(102, 126, 234, 0.1)",
+    transform: "scale(1.05)",
+  },
+  transition: "all 0.2s ease-in-out",
+};
+
+const LegendItem: React.FC<{ color: string; label: string }> = ({
+  color,
+  label,
+}) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+    <Box
+      sx={{
+        width: 12,
+        height: 12,
+        borderRadius: "50%",
+        backgroundColor: color,
+      }}
+    />
+    <Typography variant="caption" sx={{ fontWeight: 500 }}>
+      {label}
+    </Typography>
+  </Box>
+);
+
+const QuickNavButton: React.FC<{
+  tooltip: string;
+  onClick: () => void;
+  disabled?: boolean;
+  icon: React.ReactNode;
+}> = ({ tooltip, onClick, disabled, icon }) => (
+  <Tooltip title={tooltip}>
+    <span>
+      <IconButton
+        size="small"
+        onClick={onClick}
+        disabled={disabled}
+        sx={{
+          "&:hover": { backgroundColor: "rgba(102, 126, 234, 0.1)" },
+        }}
+      >
+        {icon}
+      </IconButton>
+    </span>
+  </Tooltip>
+);
+
 export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
   sleepData,
   userScores,
@@ -45,14 +102,11 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
       ...sleepData.map((item) => item.Date),
       ...userScores.map((item) => item.Date),
     ];
-
-    if (allDates.length > 0) {
-      const latestDate = new Date(
-        Math.max(...allDates.map((d) => new Date(d).getTime()))
-      );
-      return new Date(latestDate.getFullYear(), latestDate.getMonth(), 1);
-    }
-    return new Date();
+    if (allDates.length === 0) return new Date();
+    const latestDate = new Date(
+      Math.max(...allDates.map((d) => new Date(d).getTime()))
+    );
+    return new Date(latestDate.getFullYear(), latestDate.getMonth(), 1);
   }, [sleepData, userScores]);
 
   const [currentMonth, setCurrentMonth] = useState(initialMonth);
@@ -64,17 +118,11 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
     ]);
 
     const scoreMap = new Map<string, UserScore>();
-    userScores.forEach((score) => {
-      scoreMap.set(score.Date, score);
-    });
+    userScores.forEach((score) => scoreMap.set(score.Date, score));
 
     const range = getDateRange(Array.from(dates));
 
-    return {
-      availableDates: dates,
-      dateScoreMap: scoreMap,
-      dateRange: range,
-    };
+    return { availableDates: dates, dateScoreMap: scoreMap, dateRange: range };
   }, [sleepData, userScores]);
 
   const navigateMonth = useCallback((direction: "prev" | "next") => {
@@ -92,17 +140,13 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
   const handleQuickNavigation = useCallback(
     (type: "first" | "last" | "current") => {
       const today = new Date();
-
+      if (!dateRange) return;
       switch (type) {
         case "first":
-          if (dateRange) {
-            navigateToMonth(dateRange.start);
-          }
+          navigateToMonth(dateRange.start);
           break;
         case "last":
-          if (dateRange) {
-            navigateToMonth(dateRange.end);
-          }
+          navigateToMonth(dateRange.end);
           break;
         case "current":
           navigateToMonth(today);
@@ -117,7 +161,6 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
     const month = currentMonth.getMonth();
     const firstDayOfMonth = new Date(year, month, 1);
     const startDate = new Date(firstDayOfMonth);
-
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const days: DayInfo[] = [];
@@ -127,20 +170,15 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
     for (let i = 0; i < TOTAL_CALENDAR_DAYS; i++) {
       const dateString = getDateString(currentDate);
       const isCurrentMonth = currentDate.getMonth() === month;
-      const hasData = availableDates.has(dateString);
-      const scoreData = dateScoreMap.get(dateString);
-      const isToday = isSameDay(currentDate, today);
-
       days.push({
         date: new Date(currentDate),
         dateString,
         day: currentDate.getDate(),
         isCurrentMonth,
-        hasData,
-        scoreData,
-        isToday,
+        hasData: availableDates.has(dateString),
+        scoreData: dateScoreMap.get(dateString),
+        isToday: isSameDay(currentDate, today),
       });
-
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
@@ -149,149 +187,88 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
 
   const handleDateClick = useCallback(
     (dayInfo: DayInfo) => {
-      if (dayInfo.isCurrentMonth) {
-        onDateSelect(dayInfo.dateString);
-      }
+      if (dayInfo.isCurrentMonth) onDateSelect(dayInfo.dateString);
     },
     [onDateSelect]
   );
 
   const getScoreIndicatorColor = useCallback((dayInfo: DayInfo) => {
     if (!dayInfo.hasData) return null;
-
     if (dayInfo.scoreData) {
-      const scoreType = dayInfo.scoreData.ScoreType;
-      const config = getScoreConfig(scoreType);
-      return config.color;
+      return getScoreConfig(dayInfo.scoreData.ScoreType)?.color || "primary.main";
     }
-
     return "primary.main";
   }, []);
 
-  if (loading) {
+  if (loading)
     return (
-      <Card elevation={2}>
-        <CardContent>
-          <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-            <CircularProgress />
+      <Card elevation={0} sx={cardStyles}>
+        <CardContent sx={{ p: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <CircularProgress sx={{ color: "#667eea" }} />
           </Box>
         </CardContent>
       </Card>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
-      <Card elevation={2}>
-        <CardContent>
-          <Alert severity="error">{error}</Alert>
+      <Card elevation={0} sx={cardStyles}>
+        <CardContent sx={{ p: 4 }}>
+          <Alert severity="error" sx={{ borderRadius: 2 }}>
+            {error}
+          </Alert>
         </CardContent>
       </Card>
     );
-  }
-
   return (
-    <Card elevation={2}>
-      <CardContent>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 3,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <CalendarToday color="primary" />
-            <Typography variant="h6">Select Date</Typography>
-            <Chip label={`${availableDates.size} days recorded`} size="small" />
+    <Card elevation={0} sx={cardStyles}>
+      <CardContent
+        sx={{ p: 4, height: "100%", display: "flex", flexDirection: "column" }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box sx={{ width: 6, height: 28, background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", borderRadius: 1 }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b", mb: 0.5 }}>
+                Select Date
+              </Typography>
+              <Chip
+                label={`${availableDates.size} days recorded`}
+                size="small"
+                sx={{ backgroundColor: "rgba(102, 126, 234, 0.1)", color: "#667eea", fontWeight: 600, fontSize: "0.75rem" }}
+              />
+            </Box>
           </Box>
-          <Box sx={{ display: "flex", gap: 0.5 }}>
-            <Tooltip title="First data">
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={() => handleQuickNavigation("first")}
-                  disabled={!dateRange}
-                >
-                  <FirstPage fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title="Today">
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={() => handleQuickNavigation("current")}
-                >
-                  <CalendarToday fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title="Latest data">
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={() => handleQuickNavigation("last")}
-                  disabled={!dateRange}
-                >
-                  <LastPage fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
+          <Box sx={{ display: "flex", gap: 0.5, backgroundColor: "rgba(255, 255, 255, 0.8)", borderRadius: 2, p: 0.5, border: "1px solid rgba(102, 126, 234, 0.1)" }}>
+            <QuickNavButton tooltip="First data" onClick={() => handleQuickNavigation("first")} disabled={!dateRange} icon={<FirstPage fontSize="small" />} />
+            <QuickNavButton tooltip="Today" onClick={() => handleQuickNavigation("current")} icon={<CalendarToday fontSize="small" />} />
+            <QuickNavButton tooltip="Latest data" onClick={() => handleQuickNavigation("last")} disabled={!dateRange} icon={<LastPage fontSize="small" />} />
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <IconButton onClick={() => navigateMonth("prev")} size="small">
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 3, gap: 2 }}>
+          <IconButton onClick={() => navigateMonth("prev")} size="small" sx={navButtonStyles}>
             <ChevronLeft />
           </IconButton>
-          <Typography variant="h6" fontWeight="600">
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b", minWidth: "200px", textAlign: "center", letterSpacing: "-0.01em" }}>
             {getMonthYear(currentMonth)}
           </Typography>
-          <IconButton onClick={() => navigateMonth("next")} size="small">
+          <IconButton onClick={() => navigateMonth("next")} size="small" sx={navButtonStyles}>
             <ChevronRight />
           </IconButton>
         </Box>
 
-        <Box>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: 1,
-              mb: 1,
-            }}
-          >
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 1, mb: 2 }}>
             {WEEK_DAYS.map((day) => (
-              <Box
-                key={day}
-                sx={{
-                  textAlign: "center",
-                  py: 1,
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "text.secondary",
-                }}
-              >
+              <Box key={day} sx={{ textAlign: "center", py: 1, fontSize: "0.875rem", fontWeight: 700, color: "#64748b", letterSpacing: "0.02em" }}>
                 {day}
               </Box>
             ))}
           </Box>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: 1,
-            }}
-          >
+
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 1.5 }}>
             {calendarDays.map((dayInfo, index) => {
               const indicatorColor = getScoreIndicatorColor(dayInfo);
 
@@ -325,20 +302,14 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
                   <Box
                     onClick={() => handleDateClick(dayInfo)}
                     sx={{
-                      height: 56,
+                      height: 48,
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      cursor:
-                        dayInfo.hasData || dayInfo.isCurrentMonth
-                          ? "pointer"
-                          : "default",
-                      backgroundColor: dayInfo.isToday
-                        ? "primary.light"
-                        : "transparent",
-                      border: dayInfo.isToday ? "2px solid" : "1px solid",
-                      borderColor: dayInfo.isToday ? "primary.main" : "divider",
+                      position: "relative",
+                      cursor: dayInfo.hasData || dayInfo.isCurrentMonth ? "pointer" : "default",
+                      border: dayInfo.isToday ? "2px solid #667eea" : "none",
                       borderRadius: 2,
                       opacity: dayInfo.isCurrentMonth ? 1 : 0.3,
                       transition: "all 0.2s ease-in-out",
@@ -346,41 +317,58 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
                         dayInfo.hasData || dayInfo.isCurrentMonth
                           ? {
                               backgroundColor: dayInfo.isToday
-                                ? "primary.light"
-                                : "action.hover",
-                              transform: dayInfo.hasData
-                                ? "scale(1.05)"
-                                : "none",
-                              boxShadow: dayInfo.hasData ? 2 : 0,
+                                ? "rgba(102, 126, 234, 0.1)"
+                                : dayInfo.hasData
+                                ? "rgba(102, 126, 234, 0.05)"
+                                : "rgba(102, 126, 234, 0.03)",
+                              transform: dayInfo.hasData ? "scale(1.05)" : "none",
                             }
                           : {},
-                      position: "relative",
                     }}
                   >
+                    {dayInfo.isToday && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: -2,
+                          left: -2,
+                          right: -2,
+                          bottom: -2,
+                          borderRadius: 2,
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          zIndex: 0,
+                        }}
+                      />
+                    )}
                     <Typography
                       variant="body2"
                       sx={{
-                        fontWeight: dayInfo.isToday
-                          ? 600
-                          : dayInfo.hasData
-                          ? 500
-                          : 400,
+                        fontWeight: dayInfo.isToday ? 700 : dayInfo.hasData ? 600 : 500,
                         color: dayInfo.isToday
-                          ? "primary.contrastText"
+                          ? "white"
                           : dayInfo.isCurrentMonth
-                          ? "text.primary"
-                          : "text.disabled",
+                          ? dayInfo.hasData
+                            ? "#1e293b"
+                            : "#64748b"
+                          : "#94a3b8",
+                        zIndex: 2,
+                        position: "relative",
+                        fontSize: "0.95rem",
                       }}
                     >
                       {dayInfo.day}
                     </Typography>
 
                     {dayInfo.hasData && indicatorColor && (
-                      <FiberManualRecord
+                      <Box
                         sx={{
-                          fontSize: 10,
-                          color: indicatorColor,
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          backgroundColor: indicatorColor,
                           mt: 0.5,
+                          zIndex: 2,
+                          opacity: 0.8,
                         }}
                       />
                     )}
@@ -391,31 +379,26 @@ export const CalendarDateSelector: React.FC<CalendarDateSelectorProps> = ({
           </Box>
         </Box>
 
-        <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: "divider" }}>
+        <Box sx={{ m: 3 }}>
           <Typography
             variant="caption"
-            color="text.secondary"
-            sx={{ display: "block", mb: 1 }}
+            sx={{
+              display: "block",
+              mb: 2,
+              fontWeight: 600,
+              color: "#64748b",
+              fontSize: "0.8rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
           >
-            Legend:
+            Legend for Vitalz Score
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <FiberManualRecord sx={{ fontSize: 8, color: "success.main" }} />
-              <Typography variant="caption">Excellent (80+)</Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <FiberManualRecord sx={{ fontSize: 8, color: "warning.main" }} />
-              <Typography variant="caption">Moderate (40-79)</Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <FiberManualRecord sx={{ fontSize: 8, color: "error.main" }} />
-              <Typography variant="caption">Poor (&lt;40)</Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <FiberManualRecord sx={{ fontSize: 8, color: "primary.main" }} />
-              <Typography variant="caption">Data Available</Typography>
-            </Box>
+          <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+            <LegendItem color="success.main" label="Excellent (80+)" />
+            <LegendItem color="warning.main" label="Moderate (40-79)" />
+            <LegendItem color="error.main" label="Poor (<40)" />
+            <LegendItem color="#667eea" label="Data Available" />
           </Box>
         </Box>
       </CardContent>

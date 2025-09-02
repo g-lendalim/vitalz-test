@@ -122,7 +122,7 @@ const RangeVariability = ({ stats, unit }: { stats: any; unit: string }) => (
       border: "1px solid rgba(0,0,0,0.08)",
     }}
   >
-    <Box sx={{ display: "flex", flexDirection: "row", gap: 6, mb: 1 }}>
+    <Box sx={{ display: "flex", flexDirection: "row", gap: 4, mb: 1 }}>
       <Typography variant="caption" fontWeight="600" sx={{ color: "#333" }}>
         RANGE
       </Typography>
@@ -392,7 +392,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
             <Grid size={{ xs: 6 }}>
               <MetricInfoBox title="MAXIMUM" value={`${stats.max} ${unit}`} />
             </Grid>
-            <Grid size={{ xs: 12 }} >
+            <Grid size={{ xs: 12 }}>
               <MetricInfoBox
                 title="IRREGULAR READINGS DETECTED"
                 value={
