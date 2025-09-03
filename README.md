@@ -12,6 +12,7 @@ Currently, two official plugins are available:
 
 Clone the repo and install dependencies:
 
+```bash
 git clone <repo-url>
 cd <repo-folder>
 npm install
